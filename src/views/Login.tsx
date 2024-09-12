@@ -4,7 +4,8 @@
 import { useState } from 'react'
 
 // Next Imports
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+
 
 // MUI Imports
 import Typography from '@mui/material/Typography'
@@ -33,9 +34,23 @@ import themeConfig from '@configs/themeConfig'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 
+import { pipe, object, string, minLength, email, nonEmpty } from 'valibot'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+import { Controller, useForm } from 'react-hook-form'
+
+type ErrorType = {
+  message: string[]
+}
+
+const schema = object({
+  email: pipe(string(), nonEmpty('This field is required'), email('Invalid email')),
+  password: pipe(string(), nonEmpty('This field is required'), minLength(6, 'Password must be at least 6 characters'))
+})
+
 const LoginV2 = ({ mode }: { mode: Mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [errorState, setErrorState] = useState<ErrorType | null>(null)
 
   // Vars
   const darkImg = '/images/pages/auth-v2-mask-1-dark.png'
@@ -49,6 +64,11 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
   const router = useRouter()
   const { settings } = useSettings()
   const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const {lang: locale} = useParams()
+
+  const {control, handleSubmit, formState: {errors}} = useForm<FormData>({
+    resolver: valibotResolver(schema)
+  })
 
   const characterIllustration = useImageVariant(
     mode,

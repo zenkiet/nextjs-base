@@ -1,3 +1,9 @@
 {
-  "navigation": {}
+  "navigation": {
+    "about": "アバウト",
+    "home": "ホーム"
+  },
+  "home": {
+    "title": "これはホームです"
+  }
 }
